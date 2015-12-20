@@ -12,8 +12,8 @@ module XCPretty
     # @regex Captured groups
     # $1 target
     # $2 project
-    # $3 configuration
-    BUILD_TARGET_MATCHER = /^=== BUILD TARGET\s(.*)\sOF PROJECT\s(.*)\sWITH.*CONFIGURATION\s(.*)\s===/
+    # $3 || $4 configuration
+    BUILD_TARGET_MATCHER = /^=== BUILD TARGET\s(.*)\sOF PROJECT\s(.*)\s(?:WITH CONFIGURATION\s(.*)|WITH THE DEFAULT CONFIGURATION \((.*)\) NOT USING.*)\s===/
 
     # @regex Captured groups
     # $1 target
@@ -24,8 +24,8 @@ module XCPretty
     # @regex Captured groups
     # $1 target
     # $2 project
-    # $3 configuration
-    ANALYZE_TARGET_MATCHER = /^=== ANALYZE TARGET\s(.*)\sOF PROJECT\s(.*)\sWITH.*CONFIGURATION\s(.*)\s===/
+    # $3 || $4 configuration
+    ANALYZE_TARGET_MATCHER = /^=== ANALYZE TARGET\s(.*)\sOF PROJECT\s(.*)\s(?:WITH CONFIGURATION\s(.*)|WITH THE DEFAULT CONFIGURATION \((.*)\) NOT USING.*)\s===/
 
     # @regex Nothing returned here for now
     CHECK_DEPENDENCIES_MATCHER = /^Check dependencies/
@@ -45,8 +45,8 @@ module XCPretty
     # @regex Captured groups
     # $1 target
     # $2 project
-    # $3 configuration
-    CLEAN_TARGET_MATCHER = /^=== CLEAN TARGET\s(.*)\sOF PROJECT\s(.*)\sWITH CONFIGURATION\s(.*)\s===/
+    # $3 || $4 configuration
+    CLEAN_TARGET_MATCHER = /^=== CLEAN TARGET\s(.*)\sOF PROJECT\s(.*)\s(?:WITH CONFIGURATION\s(.*)|WITH THE DEFAULT CONFIGURATION \((.*)\) NOT USING.*)\s===/
 
     # @regex Captured groups
     # $1 = file
@@ -292,13 +292,13 @@ module XCPretty
       when BUILD_TARGET_MATCHER
         formatter.format_build_target($1, $2, $3)
       when AGGREGATE_TARGET_MATCHER
-        formatter.format_aggregate_target($1, $2, $3)
+        formatter.format_build_target($1, $2, $3 || $4)
       when ANALYZE_TARGET_MATCHER
-        formatter.format_analyze_target($1, $2, $3)
+        formatter.format_analyze_target($1, $2, $3 || $4)
       when CLEAN_REMOVE_MATCHER
         formatter.format_clean_remove
       when CLEAN_TARGET_MATCHER
-        formatter.format_clean_target($1, $2, $3)
+        formatter.format_clean_target($1, $2, $3 || $4)
       when COPY_STRINGS_MATCHER
         formatter.format_copy_strings_file($1)
       when CHECK_DEPENDENCIES_MATCHER
