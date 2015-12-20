@@ -30,6 +30,10 @@ module XCPretty
       ansi_parse(text, :plain, :bold)
     end
 
+    def darkgray(text)
+      ansi_parse(text, :black, :bold)
+    end
+
     def red(text)
       ansi_parse(text, :red)
     end

@@ -65,6 +65,9 @@ module XCPretty
     #       the same for warnings
     def format_compile_warning(file_name, file_path, reason,
                                line, cursor);                  EMPTY; end
+
+    def format_compile_note(file_name, file_path, reason,
+                               line, cursor);                  EMPTY; end
   end
 
   class Formatter
@@ -116,6 +119,9 @@ module XCPretty
     WARNING = '⚠️ '
     ASCII_WARNING = '[!]'
 
+    NOTE = '☞ '
+    ASCII_NOTE = '-->'
+
     def format_error(message)
       "\n#{red(error_symbol + " " + message)}\n\n"
     end
@@ -131,6 +137,11 @@ module XCPretty
 
     def format_compile_warning(file, file_path, reason, line, cursor)
       "\n#{yellow(warning_symbol + ' ')}#{file_path}: #{yellow(reason)}\n\n" \
+        "#{line}\n#{cyan(cursor)}\n\n"
+    end
+
+    def format_compile_note(file, file_path, reason, line, cursor)
+      "#{darkgray(note_symbol + ' ')}#{file_path}: #{darkgray(reason)}\n\n" \
         "#{line}\n#{cyan(cursor)}\n\n"
     end
 
@@ -175,6 +186,10 @@ module XCPretty
 
     def warning_symbol
       use_unicode? ? WARNING : ASCII_WARNING
+    end
+
+    def note_symbol
+      use_unicode? ? NOTE : ASCII_NOTE
     end
 
   end

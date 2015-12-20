@@ -222,6 +222,12 @@ module XCPretty
       COMPILE_ERROR_MATCHER = /^(\/.+\/(.*):.*:.*):\s(?:fatal\s)?error:\s(.*)$/
 
       # @regex Captured groups
+      # $1 = file_path
+      # $2 = file_name
+      # $3 = reason
+      COMPILE_NOTE_MATCHER = /^(\/.+\/(.*):.*:.*):\snote:\s(.*)$/
+
+      # @regex Captured groups
       # $1 cursor (with whitespaces and tildes)
       CURSOR_MATCHER = /^([\s~]*\^[\s~]*)$/
 
@@ -283,6 +289,7 @@ module XCPretty
 
       return format_compile_error if should_format_error?
       return format_compile_warning if should_format_warning?
+      return format_compile_note if should_format_note?
       return format_undefined_symbols if should_format_undefined_symbols?
       return format_duplicate_symbols if should_format_duplicate_symbols?
 
@@ -418,9 +425,12 @@ module XCPretty
       elsif text =~ COMPILE_WARNING_MATCHER
         @formatting_warning = true
         update_error.call
+      elsif text =~ COMPILE_NOTE_MATCHER
+        @formatting_note = true
+        update_error.call
       elsif text =~ CURSOR_MATCHER
         current_issue[:cursor]    = $1.chomp
-      elsif @formatting_error || @formatting_warning
+      elsif @formatting_error || @formatting_warning || @formatting_note
         current_issue[:line]      = text.chomp
       end
     end
@@ -451,6 +461,10 @@ module XCPretty
 
     def should_format_warning?
       @formatting_warning && error_or_warning_is_present
+    end
+
+    def should_format_note?
+      @formatting_note && error_or_warning_is_present
     end
 
     def error_or_warning_is_present
@@ -493,6 +507,17 @@ module XCPretty
                                        warning[:reason],
                                        warning[:line],
                                        warning[:cursor])
+    end
+
+    def format_compile_note
+      warning = current_issue.dup
+      @current_issue = {}
+      @formatting_note = false
+      formatter.format_compile_note(warning[:file_name],
+                                    warning[:file_path],
+                                    warning[:reason],
+                                    warning[:line],
+                                    warning[:cursor])
     end
 
     def format_undefined_symbols
